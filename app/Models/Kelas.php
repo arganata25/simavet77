@@ -19,6 +19,7 @@ class Kelas extends Model
 
     protected $fillable = [
         'nama',
+        'tingkat',
         'jurusan',
         'kapasitas',
         'wali_kelas_id',

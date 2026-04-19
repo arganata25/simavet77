@@ -45,4 +45,5 @@ class Siswa extends Model{
         'nisn' => $this->doc_nisn,
     ];
 }
+
 }
