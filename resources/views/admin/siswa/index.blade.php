@@ -7,11 +7,25 @@
     <div class="flex justify-between mb-4">
         <h1 class="text-2xl font-bold">Data Siswa</h1>
 
-      <button onclick="openModal()" 
+        <button onclick="openModal()" 
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow">
             + Tambah Siswa
         </button>
     </div>
+
+    {{-- ERROR --}}
+    @if(session('error'))
+        <div class="bg-red-100 text-red-700 p-3 mb-3">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    {{-- SUCCESS --}}
+    @if(session('success'))
+        <div class="bg-green-100 text-green-700 p-3 mb-3">
+            {{ session('success') }}
+        </div>
+    @endif
 
     <!-- SEARCH -->
     <form method="GET" class="mb-4">
@@ -27,61 +41,46 @@
                     <th class="p-3">Nama</th>
                     <th class="p-3">NISN</th>
                     <th class="p-3">Kelas</th>
-                    <th class="p-3">Jurusan</th>
-                    <th class="p-3">Angkatan</th>
                     <th class="p-3">JK</th>
                     <th class="p-3">Aksi</th>
                 </tr>
             </thead>
 
             <tbody>
-@foreach($siswa as $s)
-<tr class="border-t">
-    <td class="p-3">{{ $s->nama_lengkap }}</td>
-    <td class="p-3">{{ $s->nisn }}</td>
+                @foreach($siswa as $s)
+                <tr class="border-t">
+                    <td class="p-3">{{ $s->nama_lengkap }}</td>
+                    <td class="p-3">{{ $s->nisn }}</td>
 
-    <!-- KELAS -->
-    <td class="p-3">
-        {{ $s->kelas->nama ?? '-' }}
-    </td>
+                    <td class="p-3">
+                        {{ $s->kelas->nama ?? '-' }}
+                    </td>
 
-    <!-- JURUSAN -->
-    <td class="p-3">
-        {{ $s->kelas->jurusan ?? '-' }}
-    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded text-xs 
+                        {{ $s->jenis_kelamin == 'Laki-laki' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600' }}">
+                        {{ $s->jenis_kelamin }}
+                        </span>
+                    </td>
 
-    <!-- ANGKATAN -->
-    <td class="p-3">
-        {{ $s->kelas->tahunAjaran->nama ?? '-' }}
-    </td>
+                    <td class="p-3 flex gap-2">
 
-    <!-- JK -->
-    <td class="p-3">
-        <span class="px-2 py-1 rounded text-xs 
-        {{ $s->jenis_kelamin == 'Laki-laki' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600' }}">
-        {{ $s->jenis_kelamin }}
-        </span>
-    </td>
+                        <button onclick='editData(@json($s))'
+                            class="bg-blue-500 text-white px-3 py-1 rounded">
+                            Edit
+                        </button>
 
-    <!-- AKSI -->
-    <td class="p-3 flex gap-2">
+                        <form method="POST" action="{{ route('admin.siswa.destroy',$s->id) }}">
+                            @csrf @method('DELETE')
+                            <button class="bg-red-500 text-white px-3 py-1 rounded">
+                                Hapus
+                            </button>
+                        </form>
 
-        <button onclick='editData(@json($s))'
-            class="bg-blue-500 text-white px-3 py-1 rounded">
-            Edit
-        </button>
-
-        <form method="POST" action="{{ route('admin.siswa.destroy',$s->id) }}">
-            @csrf @method('DELETE')
-            <button class="bg-red-500 text-white px-3 py-1 rounded">
-                Hapus
-            </button>
-        </form>
-
-    </td>
-</tr>
-@endforeach
-</tbody>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
         </table>
 
         <div class="p-4">
@@ -96,37 +95,43 @@
     <div class="bg-white p-6 rounded w-96">
         <h2 class="text-lg font-bold mb-4">Form Siswa</h2>
 
-        <form id="form" method="POST" >
+        <form id="form" method="POST">
             @csrf
-
             <input type="hidden" name="_method" id="method">
 
-            <input name="nama_lengkap" 
-            id="nama" 
-            placeholder="Nama"
-             class="w-full border p-2 mb-2">
+            <input name="nama_lengkap" id="nama"
+                placeholder="Nama"
+                class="w-full border p-2 mb-2" required>
 
-            <input name="nisn" id="nisn" placeholder="NISN"
-                class="w-full border p-2 mb-2">
-              <div class="mb-2">
-    <label class="block text-sm mb-1">Jenis Kelamin</label>
+            <input name="nisn" id="nisn"
+                placeholder="NISN"
+                class="w-full border p-2 mb-2" required>
 
-    <div class="flex gap-4">
-        <label class="flex items-center gap-2">
-            <input type="radio" name="jenis_kelamin" value="Laki-laki">
-            Laki-laki
-        </label>
+            <!-- TINGKAT -->
+<select name="tingkat" id="tingkat" class="w-full border p-2 mb-2" required>
+    <option value="">Pilih Kelas</option>
+    <option value="X">X</option>
+    <option value="XI">XI</option>
+    <option value="XII">XII</option>
+</select>
 
-        <label class="flex items-center gap-2">
-            <input type="radio" name="jenis_kelamin" value="Perempuan">
-            Perempuan
-        </label>
-    </div>
-</div>
+</select>
+            <!-- JK -->
+            <div class="mb-2">
+                <label class="block text-sm mb-1">Jenis Kelamin</label>
+                <div class="flex gap-4">
+                    <label>
+                        <input type="radio" name="jenis_kelamin" value="Laki-laki"> Laki-laki
+                    </label>
+                    <label>
+                        <input type="radio" name="jenis_kelamin" value="Perempuan"> Perempuan
+                    </label>
+                </div>
+            </div>
 
-<input name="no_hp_siswa" placeholder="No HP" class="w-full border p-2 mb-2">
-
-<input name="kelas_id" placeholder="ID Kelas" class="w-full border p-2 mb-2">
+            <input name="no_hp_siswa" id="no_hp"
+                placeholder="No HP"
+                class="w-full border p-2 mb-3">
 
             <button class="bg-indigo-600 text-white px-4 py-2 w-full">
                 Simpan
@@ -140,8 +145,12 @@
 <script>
 function openModal() {
     document.getElementById('modal').classList.remove('hidden');
-    document.getElementById('form').action = "{{ route('admin.siswa.store') }}";
+
+    let form = document.getElementById('form');
+    form.action = "{{ route('admin.siswa.store') }}";
     document.getElementById('method').value = '';
+
+    form.reset();
 }
 
 function closeModal() {
@@ -150,8 +159,16 @@ function closeModal() {
 
 function editData(data) {
     openModal();
+
     document.getElementById('nama').value = data.nama_lengkap;
     document.getElementById('nisn').value = data.nisn;
+    document.getElementById('kelas_id').value = data.kelas_id;
+    document.getElementById('no_hp').value = data.no_hp_siswa;
+
+    // SET RADIO
+    document.querySelectorAll('input[name="jenis_kelamin"]').forEach(r => {
+        r.checked = r.value === data.jenis_kelamin;
+    });
 
     document.getElementById('form').action = '/admin/siswa/' + data.id;
     document.getElementById('method').value = 'PUT';

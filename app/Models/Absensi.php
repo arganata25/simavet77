@@ -15,16 +15,17 @@ class Absensi extends Model
         'siswa_id',
         'jadwal_pelajaran_id',
         'tanggal',
-        'status'
+        'status',
+        'keterangan'
     ];
 
     public function siswa()
     {
-        return $this->belongsTo(Siswa::class);
+        return $this->belongsTo(Siswa::class, 'siswa_id');
     }
 
     public function jadwalPelajaran()
     {
-        return $this->belongsTo(JadwalPelajaran::class);
+        return $this->belongsTo(JadwalPelajaran::class, 'jadwal_pelajaran_id');
     }
 }

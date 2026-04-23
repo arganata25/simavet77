@@ -4,14 +4,12 @@
 
 <div class="p-6">
 
-    <div class="flex justify-between mb-4">
-        <h1 class="text-xl font-bold">Recycle Bin Jadwal</h1>
+    <h1 class="text-xl font-bold mb-4">Recycle Bin Jadwal</h1>
 
-        <a href="{{ route('admin.jadwal-pelajaran.index') }}"
-           class="bg-gray-500 text-white px-3 py-2 rounded">
-            Kembali
-        </a>
-    </div>
+    <a href="{{ route('admin.jadwal-pelajaran.index') }}"
+        class="bg-gray-500 text-white px-3 py-2 rounded mb-4 inline-block">
+        ← Kembali
+    </a>
 
     <div class="bg-white shadow rounded overflow-hidden">
 

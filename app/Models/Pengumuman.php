@@ -9,11 +9,13 @@ class Pengumuman extends Model
     protected $table = 'pengumuman';
 
     protected $fillable = [
-        'user_id',
-        'judul',
-        'isi',
-        'tanggal'
-    ];
+    'user_id',
+    'judul',
+    'kategori',
+    'tanggal',
+    'isi',
+    'prioritas'
+];
 
     public function user()
     {

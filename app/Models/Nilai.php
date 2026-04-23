@@ -34,9 +34,19 @@ class Nilai extends Model
         return $this->belongsTo(JadwalPelajaran::class);
     }
 
+    public function mataPelajaran()
+    {
+        return $this->belongsTo(MataPelajaran::class, 'mata_pelajaran_id');
+    }
+
     public function guru()
     {
         return $this->belongsTo(Guru::class);
+    }
+
+    public function tahunAjaran()
+    {
+        return $this->belongsTo(TahunAjaran::class);
     }
 
     public function hitungNilaiAkhir(): float

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Schema;
 use App\Models\User;
 use App\Models\Guru;
 use App\Models\Siswa;
@@ -20,10 +21,11 @@ class DashboardController extends Controller
             'total_user'  => User::count(),
         ];
 
-        $pengumuman = Pengumuman::where('is_active', true)
-            ->latest()
-            ->take(5)
-            ->get();
+       $pengumuman = [];
+
+if (Schema::hasTable('pengumuman')) {
+    $pengumuman = Pengumuman::latest()->take(5)->get();
+}
 
         return view('admin.dashboard', compact('stats', 'pengumuman'));
     }

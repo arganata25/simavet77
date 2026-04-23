@@ -12,16 +12,18 @@ use Illuminate\Http\Request;
 
 class NilaiController extends Controller
 {
-    // LIST
+    // ======================
+    // INDEX
+    // ======================
     public function index(Request $request)
     {
         $query = Nilai::with(['siswa', 'mataPelajaran', 'guru', 'tahunAjaran']);
 
-        // filter opsional
+        // FILTER
         if ($request->filled('kelas_id')) {
-            $query->whereHas('siswa', fn($q) =>
-                $q->where('kelas_id', $request->kelas_id)
-            );
+            $query->whereHas('siswa', function ($q) use ($request) {
+                $q->where('kelas_id', $request->kelas_id);
+            });
         }
 
         if ($request->filled('mapel_id')) {
@@ -37,18 +39,22 @@ class NilaiController extends Controller
         return view('admin.nilai.index', compact('nilai'));
     }
 
-    // FORM CREATE
+    // ======================
+    // CREATE
+    // ======================
     public function create()
     {
-        $siswa = Siswa::all();
-        $mapel = MataPelajaran::all();
-        $guru  = Guru::all();
-        $tahun = TahunAjaran::all();
-
-        return view('admin.nilai.create', compact('siswa','mapel','guru','tahun'));
+        return view('admin.nilai.create', [
+            'siswa' => Siswa::all(),
+            'mapel' => MataPelajaran::all(),
+            'guru'  => Guru::all(),
+            'tahun' => TahunAjaran::all(),
+        ]);
     }
 
+    // ======================
     // STORE
+    // ======================
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -62,11 +68,13 @@ class NilaiController extends Controller
             'catatan' => 'nullable|string'
         ]);
 
-        // hitung nilai akhir
-        $data['nilai_akhir'] =
-            ($data['nilai_harian'] ?? 0) * 0.2 +
-            ($data['nilai_uts'] ?? 0) * 0.3 +
-            ($data['nilai_uas'] ?? 0) * 0.5;
+        // default null → 0
+        $nh = $data['nilai_harian'] ?? 0;
+        $uts = $data['nilai_uts'] ?? 0;
+        $uas = $data['nilai_uas'] ?? 0;
+
+        // hitung akhir
+        $data['nilai_akhir'] = ($nh * 0.2) + ($uts * 0.3) + ($uas * 0.5);
 
         // predikat
         $data['predikat'] = $this->getPredikat($data['nilai_akhir']);
@@ -78,35 +86,45 @@ class NilaiController extends Controller
             ->with('success', 'Nilai berhasil ditambahkan');
     }
 
+    // ======================
     // EDIT
+    // ======================
     public function edit($id)
     {
         $nilai = Nilai::findOrFail($id);
 
-        $siswa = Siswa::all();
-        $mapel = MataPelajaran::all();
-        $guru  = Guru::all();
-        $tahun = TahunAjaran::all();
-
-        return view('admin.nilai.edit', compact('nilai','siswa','mapel','guru','tahun'));
+        return view('admin.nilai.edit', [
+            'nilai' => $nilai,
+            'siswa' => Siswa::all(),
+            'mapel' => MataPelajaran::all(),
+            'guru'  => Guru::all(),
+            'tahun' => TahunAjaran::all(),
+        ]);
     }
 
+    // ======================
     // UPDATE
+    // ======================
     public function update(Request $request, $id)
     {
         $nilai = Nilai::findOrFail($id);
 
         $data = $request->validate([
+            'siswa_id' => 'required|exists:siswa,id',
+            'mata_pelajaran_id' => 'required|exists:mata_pelajaran,id',
+            'tahun_ajaran_id' => 'required|exists:tahun_ajaran,id',
+            'guru_id' => 'required|exists:guru,id',
             'nilai_harian' => 'nullable|numeric|min:0|max:100',
             'nilai_uts' => 'nullable|numeric|min:0|max:100',
             'nilai_uas' => 'nullable|numeric|min:0|max:100',
             'catatan' => 'nullable|string'
         ]);
 
-        $data['nilai_akhir'] =
-            ($data['nilai_harian'] ?? 0) * 0.2 +
-            ($data['nilai_uts'] ?? 0) * 0.3 +
-            ($data['nilai_uas'] ?? 0) * 0.5;
+        $nh = $data['nilai_harian'] ?? 0;
+        $uts = $data['nilai_uts'] ?? 0;
+        $uas = $data['nilai_uas'] ?? 0;
+
+        $data['nilai_akhir'] = ($nh * 0.2) + ($uts * 0.3) + ($uas * 0.5);
 
         $data['predikat'] = $this->getPredikat($data['nilai_akhir']);
 
@@ -117,7 +135,9 @@ class NilaiController extends Controller
             ->with('success', 'Nilai berhasil diupdate');
     }
 
+    // ======================
     // DELETE
+    // ======================
     public function destroy($id)
     {
         Nilai::findOrFail($id)->delete();
@@ -125,7 +145,9 @@ class NilaiController extends Controller
         return back()->with('success', 'Nilai berhasil dihapus');
     }
 
-    // HELPER PREDIKAT
+    // ======================
+    // HELPER
+    // ======================
     private function getPredikat($nilai)
     {
         return match (true) {

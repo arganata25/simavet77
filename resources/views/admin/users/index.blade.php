@@ -78,12 +78,14 @@
                             Edit
                         </button>
 
-                        <form method="POST" action="{{ route('admin.users.destroy',$u->id) }}">
-                            @csrf @method('DELETE')
-                            <button class="text-red-600 hover:underline">
-                                Hapus
-                            </button>
-                        </form>
+                        <form method="POST" action="{{ route('admin.users.destroy', $u->id) }}">
+    @csrf
+    @method('DELETE')
+    <button onclick="return confirm('Yakin hapus user ini?')"
+        class="text-red-500">
+        Hapus
+    </button>
+</form>
 
                     </td>
 

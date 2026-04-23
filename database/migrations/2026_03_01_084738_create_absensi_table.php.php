@@ -11,6 +11,7 @@ return new class extends Migration{
             $table->id();
             $table->foreignId('siswa_id')->constrained('siswa');
             $table->foreignId('jadwal_pelajaran_id')->constrained('jadwal_pelajaran');
+            $table->foreignId('siswa_id')->nullable()->constrained()->nullOnDelete();
             $table->date('tanggal');
             $table->enum('status', ['Hadir', 'Sakit', 'Izin', 'Alpa'])->default('Hadir');
             $table->text('keterangan')->nullable();

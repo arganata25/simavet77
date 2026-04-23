@@ -13,12 +13,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('kepala_sekolah.dashboard', [
-            'totalSiswa' => Siswa::count(),
-            'totalGuru' => Guru::count(),
-            'totalKelas' => Kelas::count(),
-            'rataNilai' => round(Nilai::avg('nilai_akhir'), 2),
-            'totalAbsensiHariIni' => Absensi::whereDate('tanggal', now())->count()
-        ]);
+        $stasts = [
+            'total_siswa' => Siswa::count(),
+            'total_guru' => Guru::count(),
+            'total_kelas' => Kelas::count(),
+            'rata_nilai' => round(Nilai::avg('nilai_akhir'), 2),
+            'absensi_hari_ini' => Absensi::whereDate('tanggal', now())->count()
+        ];
+        return view('kepala_sekolah.dashboard', compact('stasts'));
     }
 }

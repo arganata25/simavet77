@@ -24,15 +24,18 @@ class JadwalPelajaranController extends Controller
     }
 
     // ================= CREATE =================
-    public function create()
-    {
-        return view('admin.jadwal_pelajaran.create', [
-            'guru' => Guru::all(),
-            'kelas' => Kelas::all(),
-            'mapel' => MataPelajaran::all(),
-        ]);
-    }
+    
+public function create()
+{
+    $guru = Guru::all();
+    $kelas = Kelas::all();
+    $mapel = MataPelajaran::all();
+    $tahunAjaran = TahunAjaran::all(); // WAJIB
 
+    return view('admin.jadwal_pelajaran.create', compact(
+        'guru','kelas','mapel','tahunAjaran'
+    ));
+}
     // ================= STORE =================
     public function store(Request $request)
     {
